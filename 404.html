@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script>
+const path = location.pathname;
+const match = path.match(/\/raw\/([a-z0-9]+)\/?$/i);
+
+if(match){
+  location.replace(
+    location.origin +
+    location.pathname.split("/raw/")[0] +
+    "/?raw=" + match[1]
+  );
+}
+</script>
+</head>
+<body></body>
+</html>
