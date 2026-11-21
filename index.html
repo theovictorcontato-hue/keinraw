@@ -1,0 +1,109 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>kein.raw</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0d1117;color:#eee;font-family:Arial}
+header{padding:20px 7%;border-bottom:1px solid #30363d}
+.logo{font-size:25px;font-weight:bold}
+.logo span{color:#8957e5}
+main{max-width:900px;margin:45px auto;padding:20px}
+input,textarea{width:100%;padding:13px;margin:10px 0;background:#161b22;color:white;border:1px solid #30363d;border-radius:7px}
+textarea{height:350px;resize:vertical;font:14px monospace}
+button{padding:12px 18px;border:0;border-radius:6px;background:#8957e5;color:white;cursor:pointer}
+#viewer{display:none;background:white;color:black;min-height:100vh;padding:8px;font:14px monospace}
+#viewer pre{white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
+#result{overflow-wrap:anywhere;margin-top:15px}
+#result a{color:#a78bfa}
+</style>
+</head>
+<body>
+<header id="header"><div class="logo">kein<span>.raw</span></div></header>
+
+<main id="editor">
+<h1>Create RAW</h1>
+<p>Write and share your text.</p>
+<input id="name" placeholder="67aurapainel">
+<textarea id="content" placeholder="Digite seu código..."></textarea>
+<button onclick="createRaw()">Create RAW</button>
+<p id="result"></p>
+</main>
+
+<div id="viewer"><pre id="rawContent"></pre></div>
+
+<script>
+const STORAGE="kein_raw_all_in_one";
+
+function database(){
+ try{return JSON.parse(localStorage.getItem(STORAGE)||"{}")}
+ catch(e){return {}}
+}
+
+function createRaw(){
+ const name=document.getElementById("name").value.trim();
+ const content=document.getElementById("content").value;
+
+ if(!name||!content.trim()){
+  alert("Preencha tudo!");
+  return;
+ }
+
+ const db=database();
+ let id;
+
+ do{
+  id=Math.random().toString(36).slice(2,9);
+ }while(db[id]);
+
+ db[id]={name,content};
+ localStorage.setItem(STORAGE,JSON.stringify(db));
+
+ const url=location.origin+"/raw/"+id;
+ const result=document.getElementById("result");
+ result.replaceChildren();
+
+ const link=document.createElement("a");
+ link.href=url;
+ link.textContent=url;
+
+ const copy=document.createElement("button");
+ copy.textContent="Copiar link";
+ copy.onclick=async()=>{
+  try{
+   await navigator.clipboard.writeText(url);
+   copy.textContent="Copiado!";
+  }catch(e){
+   prompt("Copie o link:",url);
+  }
+ };
+
+ result.append(link,document.createElement("br"),copy);
+}
+
+function openRaw(id){
+ const raw=database()[id];
+
+ document.getElementById("header").style.display="none";
+ document.getElementById("editor").style.display="none";
+ document.body.style.background="white";
+ document.getElementById("viewer").style.display="block";
+
+ document.getElementById("rawContent").textContent=
+ raw ? raw.content : "RAW not found";
+
+ document.title="RAW";
+}
+
+function route(){
+ const match=location.pathname.match(/\/raw\/([a-z0-9]+)\/?$/i);
+ if(match)openRaw(match[1]);
+}
+
+route();
+</script>
+</body>
+</html>
