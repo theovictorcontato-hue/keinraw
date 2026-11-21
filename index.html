@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -99,8 +98,9 @@ function openRaw(id){
 }
 
 function route(){
- const match=location.pathname.match(/\/raw\/([a-z0-9]+)\/?$/i);
- if(match)openRaw(match[1]);
+ const id = new URLSearchParams(location.search).get("raw");
+
+ if(id) openRaw(id);
 }
 
 route();
